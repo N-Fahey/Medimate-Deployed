@@ -45,7 +45,7 @@ const app = express();
 app.use(require('helmet')());
 app.use(
   require('cors')({
-    origin: ['http://localhost:3000', 'http://localhost:5173'],
+    origin: ['http://localhost:3000', 'http://localhost:5173', 'http://localhost'],
     optionsSuccessStatus: 200,
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: false,
