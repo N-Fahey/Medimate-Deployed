@@ -1,23 +1,19 @@
-# MediMate — Front-End Web Application ⚕️
+# MediMate — Back-End Web Application ⚕️
 
-A medical appointment management system designed to streamline patient bookings, staff management, and doctor-patient interactions. Built with React, and back-end built with Node.js, Express, and MongoDB.
+A clean, minimal back-end API for MediMate — a medical appointment booking system built with Node.js, Express and MongoDB.
 
 ## Contents
 
 - [Hardware Requirements](#hardware-requirements)
 - [Installation](#installation)
 - [Usage](#usage)
-  - [Production Environment](#production-environment)
-  - [Development Environment](#development-environment)
-  - [Running Tests](#running-tests)
+- [Endpoints](#endpoints)
 - [Dependencies](#dependencies)
   - [Deployment Dependencies](#deployment-dependencies)
   - [Development Dependencies](#development-dependencies)
 - [Alternative Technologies](#alternative-technologies)
-  - [Deployment Dependencies](#deployment-dependencies-1)
-  - [Development Dependencies](#development-dependencies-1)
 - [Style Guide](#style-guide)
-  - [Custom Rules](#custom-rules)
+- [Reference List](#reference-list)
 
 ---
 
@@ -33,29 +29,34 @@ A medical appointment management system designed to streamline patient bookings,
 
 ## Installation
 
-Prerequisites
-
-- Node.js
-- Git
-
-1. Clone repository
+1. Install Node.js (recommend NVM on Linux/macOS)
 
    ```bash
-   git clone git@github.com:lillieharlow/MediMate-Front-End-Web-App.git
-   cd MediMate-Front-End-Web-App
+   curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.2/install.sh | bash
+   nvm install --lts
    ```
 
-2. Install dependencies
+   For Windows, use the official installer (WSL recommended for NVM).
+
+2. Install MongoDB or use MongoDB Atlas: https://www.mongodb.com/try/download/community
+
+3. Clone the repo:
+
+   ```bash
+   git clone git@github.com:lillieharlow/MediMate-Back-End-Web-App.git
+   cd MediMate-Back-End-Web-App
+   ```
+
+4. Install dependencies:
 
    ```bash
    npm install
    ```
 
-3. Configure Environment
-
+5. Configure environment:
    ```bash
    cp .env.example .env
-   # open .env and set values as required
+   # Edit .env with your config
    ```
 
 ---
@@ -64,16 +65,8 @@ Prerequisites
 
 ### Production Environment
 
-1. Build Application
-
 ```bash
-npm run build
-```
-
-2. Deploy Application
-
-```bash
-# Copy contents of 'dist' folder to web server
+npm start
 ```
 
 ### Development Environment
@@ -90,80 +83,130 @@ npm test
 
 ---
 
+## Endpoints
+
+| Category | Method | Endpoint                                | Purpose                           | User Access                                 |
+| -------- | ------ | --------------------------------------- | --------------------------------- | ------------------------------------------- |
+| Base     | GET    | /api/v1/                                | Health Check                      | Public                                      |
+| Base     | GET    | /api/v1/databaseHealth                  | Database Health Check             | Public                                      |
+| Auth     | POST   | /api/v1/auth/register                   | User Registration                 | Public                                      |
+| Auth     | POST   | /api/v1/auth/login                      | User Login                        | Public                                      |
+| Patients | GET    | /api/v1/patients/                       | Get all patients                  | Staff, Doctor (If assigned)                 |
+| Patients | GET    | /api/v1/patients/:id                    | Get patient by ID                 | Staff, Doctor (If assigned), Patient (Self) |
+| Patients | POST   | /api/v1/patients/                       | Create new patient                | Staff                                       |
+| Patients | PATCH  | /api/v1/patients/:id                    | Update patient by ID              | Staff, Patient (Self)                       |
+| Patients | DELETE | /api/v1/patients/:id                    | Delete patient by ID              | Staff                                       |
+| Staff    | GET    | /api/v1/staff/                          | Get all staff accounts            | Staff                                       |
+| Staff    | GET    | /api/v1/staff/:id                       | Get staff account by ID           | Staff                                       |
+| Staff    | GET    | /api/v1/staff/patients                  | Get all patient accounts          | Staff                                       |
+| Staff    | GET    | /api/v1/staff/users                     | Get all user accounts of any type | Staff                                       |
+| Staff    | POST   | /api/v1/staff/                          | Create new staff account          | Staff                                       |
+| Staff    | PATCH  | /api/v1/staff/:id                       | Update staff account by ID        | Staff                                       |
+| Staff    | PATCH  | /api/v1/staff/userType/:id              | Update user type by ID            | Staff                                       |
+| Staff    | DELETE | /api/v1/staff/:id                       | Delete staff account by ID        | Staff                                       |
+| Doctors  | GET    | /api/v1/doctors                         | List all doctors                  | Staff, Patient                              |
+| Doctors  | GET    | /api/v1/doctors/:userId                 | Get one doctor                    | Staff, Doctor (Self), Patient (booking)     |
+| Doctors  | POST   | /api/v1/doctors                         | Create doctor profile             | Staff                                       |
+| Doctors  | PATCH  | /api/v1/doctors/:userId                 | Update doctor profile             | Staff, Doctor (Self)                        |
+| Doctors  | DELETE | /api/v1/doctors/:userId                 | Delete doctor profile             | Staff                                       |
+| Bookings | GET    | /api/v1/bookings                        | List all bookings                 | Staff                                       |
+| Bookings | GET    | /api/v1/bookings/patients/:userId       | Get all bookings for one patient  | Staff, Doctor (Self), Patient (Self)        |
+| Bookings | GET    | /api/v1/bookings/doctors/:userId        | Get all bookings for one doctor   | Staff, Doctor (Self)                        |
+| Bookings | GET    | /api/v1/bookings/:bookingId             | Get one booking                   | Staff, Doctor (Self), Patient (Self)        |
+| Bookings | POST   | /api/v1/bookings                        | Create a booking                  | Staff, Patient                              |
+| Bookings | PATCH  | /api/v1/bookings/:bookingId             | Update a booking                  | Staff, Doctor (Self), Patient (Self)        |
+| Bookings | PATCH  | /api/v1/bookings/:bookingId/doctorNotes | Update doctor notes of a booking  | Doctor (Self)                               |
+| Bookings | GET    | /api/v1/bookings/:bookingId/doctorNotes | Get doctor notes for one booking  | Doctor (Self)                               |
+| Bookings | DELETE | /api/v1/bookings/:bookingId             | Delete a booking                  | Staff, Patient (Self)                       |
+
 ## Dependencies
 
 ### Deployment Dependencies
 
-| Package           | Version | License | Purpose                                                |
-| ----------------- | ------: | ------- | ------------------------------------------------------ |
-| react             |  19.2.0 | MIT     | Primary front-end library for building user interfaces |
-| react-dom         |  19.2.0 | MIT     | Provides DOM-specific methods for React                |
-| react-icons       |   5.5.0 | MIT     | Icon library for React applications                    |
-| react-router      |   6.2.0 | MIT     | Provides routing capabilities for React applications   |
-| styled-components |   6.2.0 | MIT     | Library for styling React components with reusable CSS |
+| Package            |   Version | License      | Purpose                                                                           |
+| ------------------ | --------: | ------------ | --------------------------------------------------------------------------------- |
+| bcryptjs           |    ^3.0.3 | BSD-3-Clause | Protecting user passwords by hashing them before storage.                         |
+| cors               |    ^2.8.5 | MIT          | Enabling Cross-Origin Resource Sharing to restrict access to requested resources. |
+| express            |    ^5.2.1 | MIT          | Web framework for building RESTful APIs and handling HTTP requests.               |
+| express-rate-limit |    ^8.2.1 | MIT          | Limiting repeated requests to API endpoints.                                      |
+| express-validator  |    ^7.3.1 | MIT          | Validating and sanitizing user input.                                             |
+| helmet             |    ^8.1.0 | MIT          | Securing HTTP headers to protect the app from well-known web vulnerabilities.     |
+| jsonwebtoken       |    ^9.0.3 | MIT          | Implementing JSON Web Tokens (JWT) for secure authentication and authorization.   |
+| mongoose           |    ^9.1.1 | MIT          | Object Data Modeling (ODM) library for MongoDB.                                   |
+| validator          | ^13.15.26 | MIT          | String validation and sanitization.                                               |
 
 ### Development Dependencies
 
-| Package                     | Version | License | Purpose                                                         |
-| --------------------------- | ------: | ------- | --------------------------------------------------------------- |
-| @biomejs/biome              |  2.3.11 | MIT     | Linting / formatting tool for enforcing code style guide        |
-| @testing-library/jest-dom   |   6.9.1 | MIT     | Custom jest matchers for testing DOM nodes                      |
-| @testing-library/react      |  16.3.1 | MIT     | Utilities for testing React components                          |
-| @testing-library/user-event |  14.6.1 | MIT     | Simulates user interactions for testing                         |
-| @types/react                |  19.2.5 | MIT     | Type definitions for React                                      |
-| @types/react-dom            |  19.2.3 | MIT     | Type definitions for React                                      |
-| @vitejs/plugin-react        |   5.1.1 | MIT     | Vite plugin for React support                                   |
-| globals                     |  16.5.0 | MIT     | Provides global type definitions for testing                    |
-| jsdom                       |  27.4.0 | MIT     | JavaScript implementation of the DOM for testing                |
-| jsonwebtoken                |   9.0.3 | MIT     | Library for working with JSON Web Tokens, used for testing only |
-| msw                         |  2.12.7 | MIT     | Mock Service Worker for API mocking in tests                    |
-| vite                        |   7.2.5 | MIT     | Build tool for JavaScript projects                              |
-| vitest                      |  4.0.16 | MIT     | Testing framework for Vite projects                             |
+| Package                   | Version | License | Purpose                                                             |
+| ------------------------- | ------: | ------- | ------------------------------------------------------------------- |
+| @eslint/js                | ^9.39.2 | MIT     | JavaScript linting utility to enforce style guide.                  |
+| eslint                    | ^8.57.1 | MIT     | JavaScript linting utility to enforce style guide.                  |
+| eslint-config-airbnb      | ^19.0.4 | MIT     | Airbnb's ESLint configuration to enforce style guide.               |
+| eslint-config-airbnb-base | ^15.0.0 | MIT     | Airbnb's base ESLint configuration to enforce style guide.          |
+| eslint-config-prettier    | ^10.1.8 | MIT     | Disables ESLint rules that might conflict with Prettier formatting. |
+| eslint-plugin-node        | ^11.1.0 | MIT     | ESLint plugin for Node.js specific linting rules.                   |
+| eslint-plugin-promise     |  ^7.2.1 | ISC     | ESLint plugin for Promise-specific linting rules.                   |
+| globals                   | ^17.0.0 | MIT     | Defines global variables for use in test development.               |
+| mongodb-memory-server     | ^11.0.1 | MIT     | In-memory MongoDB server for testing purposes.                      |
+| prettier                  |  ^3.7.4 | MIT     | Code formatter to ensure consistent code style.                     |
+| supertest                 |  ^7.2.2 | MIT     | HTTP assertions for testing Node.js HTTP servers.                   |
 
 ---
 
 ## Alternative Technologies
 
-### Hardware Requirements
-
-| Hardware Selection              | Alternatives                         | Reason For Selecting                                                                                                                                                                                                                                                                                                                                                                                                   |
-| ------------------------------- | ------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Bare-metal / self hosted server | Cloud Hosting (AWS, Azure, etc), VPS | Bare-metal hosting provides dedicated resources and is a logical choice while undergoing development, and rapidly spinning up both front end and back end services for the app. For production deployment, an alternative choice would be selected, such as cloud hosting with separate front & back-end deployments, or a virtual private server (VPS), which could accomodate both services at one network location. |
-
 ### Deployment Dependencies
 
-| Package           | Alternatives                          | Reason For Selecting                                                                                                                                                                                                                                                                                                              |
-| ----------------- | ------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| react/react-dom   | vuejs, Angular, Svelte                | React is positioned as the industry standard for building web UIs, and due to its wide industry adoption and solid plugin support it was the best choice for this project.                                                                                                                                                        |
-| react-icons       | Image based icons/unicode             | React-icons provides a comprehensive library of icons with simple integration into React components. With 5+ million weekly downloads it is recognised and trusted by the community.                                                                                                                                              |
-| react-router      | TanStack Router                       | React-router is the most recognised and widely adopted routing plugin for React. While other options such as the TanStact Router exist, react-router was selected for its simple integration and recognisable syntax.                                                                                                             |
-| styled-components | CSS imports, direct component styling | styled-components provides a flexible framework for styling reusable components, with the ability to implement more complex styles than direct component styling, while also integrating closely into components without management of external CSS files. With 6+ million weekly downloads, it is recognised and well supported. |
+| Package            | Alternatives           | Reason For Selecting Package                                                                                                                                                                                                                                                                                                                                    |
+| ------------------ | ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| bcryptjs           | Argon2, Scrypt, PBKDF2 | Bcrypt was selected due to its industry acceptance, balance of security and performance, and ubiquitous documentation.                                                                                                                                                                                                                                          |
+| cors               | Corser, express-cors   | CORS itself represents the industry standard for allowing resource sharing across origins. The cors NPM package is the most widely implemented package for this purpose.                                                                                                                                                                                        |
+| express            | Fastify, Koa           | With ~57M weekly downloads, express is the largest web framework for Node.js, and therefore has the widest availability of community support & plugins. Fastify & Koa are both newer frameworks with more specialised use cases, which were not necessary for this app.                                                                                         |
+| express-rate-limit | rate-limiter-flexible  | Rate-limiter-flexible offers more advanced rate limiting features for wider use cases and integration into data storage solutions, however this app requires basic rate limiting functionality at the API level, and as such the express-rate-limit package was sufficient.                                                                                     |
+| express-validator  | joi                    | Express-validator was selected for its ease of integration with Express, while still offering sufficient validation capabilities for this use case. Joi provides more comprehensive validation and is more widely adopted, but not required for this app.                                                                                                       |
+| helmet             | hsts                   | Helmet is widely adopted by the community for setting common HTTP security headers. While other packages performing similar functions are available, they target more specific security features or headers, while Helmet provides a comprehensive simple to implement solution.                                                                                |
+| jsonwebtoken       | express-jwt, jose      | jsonwebtoken is used to create & verify JWTs in the app. Express-jwt provides specific middleware for express, and is itself dependent on jsonwebtoken, so jsonwebtoken is used for flexibility of implementation into the app. Jose provides a more comprehensive solution with additional features, however these features are not required in this use case. |
+| mongoose           | prisma, sequalize      | Mongoose was selected for its specialisation with MongoDB, and ease of integration with express. Prisma and Sequelize are more general ORM tools that support multiple databases, but were not necessary for this app.                                                                                                                                          |
 
 ### Development Dependencies
 
-| Package                                                    | Alternatives                         | Reason For Selecting                                                                                                                                                                                                                                                                                                                                                                                                                             |
-| ---------------------------------------------------------- | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| @biomejs/biome                                             | ESLint/Prettier                      | Biome was chosen for its integrated linting and formatting capabilities, and up to date features with the latest ES9 JavaScript standard. ESLint/Prettier is still the more popular choice, however with the intention to base the style guide off the AirBnB guide, and use of ES9 features, Biome was chosen for it's integration into ES9 where the AirBnB style guide directly through ESLint requires substantial additional configuration. |
-| React Testing Library (@testing-library/react, user-event) | ReactTestUtils, Browser mode testing | RTL provides a user-centric way to test React components, by focusing on how a user would interact with the UI, allowing an easy method to follow best testing practices for React applications. RTL is well recognised and widely adopted in the JS community.                                                                                                                                                                                  |
-| jsonwebtoken                                               | express-jwt, jose                    | jsonwebtoken is used to create & verify JWTs in the app. Express-jwt provides specific middleware for express, and is itself dependent on jsonwebtoken, so jsonwebtoken is used for flexibility of implementation into the app. Jose provides a more comprehensive solution with additional features, however these features are not required in this use case.                                                                                  |
-| msw                                                        | Nock, JSON Server, Mirage            | Mock Service Worker is a newer mocking tool than the alternatives, and less widely adopted, but offers a modern approach to API mocking that requires minimal configuration. Due to its modern usage and network level interception of API calls, it was selected for this project despite lower community adoption.                                                                                                                             |
-| vite, vitejs/plugin-react, globals                         | Parcel, Rsbuild                      | Vite is popular in the community and includes bundled testing tools, a wide range of plugins, and a smooth development experience. It's wide adoption made it the first choice for development of this app.                                                                                                                                                                                                                                      |
-| vitest, jsdom, jest-dom                                    | jest, Playwright                     | Vitest is integrated into the selected build tool, Vite, and provides an almost identical testing experience to jest. Vitest is well regarded by the community and widely used for React apps in particular.                                                                                                                                                                                                                                     |
-
----
+| Package                | Alternatives              | Reason For Selecting Package                                                                                                                                                                                                                                 |
+| ---------------------- | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| eslint                 | biome, oxlint             | Eslint is the most feature-rich and widely adopted JavaScript linter, providing extensive rules and community support, and integration with the AirBnB style guide, which was selected for this project.                                                     |
+| eslint-config-airbnb   | Google, Standard          | The AirBnB style guide was chosen due to its wide acceptance in the community, and ease of integration into linters & formatters.                                                                                                                            |
+| eslint-config-prettier | Eslint configuration      | eslint-config-prettier disables eslint rules that may conflict with the code formatter used in this project, prettier. An alternative would be direct modification of eslint rules to accommodate prettier formatting, which would add unnecessary workload. |
+| eslint-plugin-node     | N/A                       | Adds additional ESLint rules specific to the Node.js environment.                                                                                                                                                                                            |
+| eslint-plugin-promise  | N/A                       | Adds additional ESLint rules for improved handling of promises.                                                                                                                                                                                              |
+| globals                | N/A                       | Configures global variables for ESLint to recognize, preventing false positives for undefined variables.                                                                                                                                                     |
+| jest                   | mocha, chai               | Jest offers a comprehensive framework for writing tests, and is widely adopted in the community. While alternatives are just as capable, familiarity with Jest was a deciding factor for this project.                                                       |
+| mongodb-memory-server  | Environment configuration | Provides an in-memory MongoDB server for testing, without requiring configuration of development environment handling in database configuration.                                                                                                             |
+| prettier               | biome, beautify           | Prettier is a widely adopted code formatter, with extensive community support and integration options, particularly with ESLint and IDEs. It was chosen for its simple setup and linter integration.                                                         |
+| supertest              | nock                      | Supertest provides HTTP server mocking for Node.js implementations. It was chosen for its simplicity of integration with Express, and community recognition.                                                                                                 |
 
 ## Style Guide
 
-This project uses Biome recommended linting & formatting rules for Javascript/JSX and CSS as its style guide, with custom rules based off the AirBnB style guide as described below.
+This project follows the AirBnB JavaScript Style Guide with one alteration:
 
-- [Biome Default Ruleset](https://biomejs.dev/reference/configuration/)
+- Allow dangling underscore for MongoDB `_id`.
 
-### Custom Rules
+---
 
-Some custom rules have been included to suit project requirements and emulate elements of the AirBnB style guide for Javascript/JSX.
+## Reference List
 
-- Maximum line length is set to 100 characters
-- JSX code is allowed only in files with .jsx extension
-- Single quotes are enforced for .js files, and double quotes for .jsx files
-- CSS formatting/linting is enabled
-- Multiline binary expressions & ternary operators include the operator at the beginning of the new line
+Express-validator. (2025) _express-validator_, https://express-validator.github.io/docs, accessed: 5 January 2025.
+
+Iqbal, K. (2025) _Authentication with JWT in MERN (Step-by-Step Guide)_, https://mernblog.com/blog/authentication-jwt-mern, accessed: 5 January 2025.
+
+Lew, Z. (2019) _A step-by-step intro to end-point testing_, https://www.freecodecamp.org/news/end-point-testing/, accessed: 6 January 2026.
+
+mongodb-memory-server. (2026) _mongodb-memory-server_ [GitHub repository], https://github.com/typegoose/mongodb-memory-server, accessed: 7 January 2026.
+
+Open JS Foundation. (n.d.) _Using Middleware_, https://expressjs.com/en/guide/using-middleware.html, accessed: 5 January 2026.
+
+Pal, R. (2020) _NodeJS RESTful API Testing With Jest and Supertest_, https://medium.com/@palrajesh/nodejs-restful-api-testing-with-jest-and-supertest-490d636fe71, accessed: 6 January 2026.
+
+Ram, M. (2025) _Beginner’s Guide: JWT Authentication Flow in MERN Stack_, https://www.linkedin.com/pulse/beginners-guide-jwt-authentication-flow-mern-stack-mukesh-ram-max--xzqvf/, accessed: 5 January 2025.
+
+Testim. (2025) _Supertest: How to Test APIs Like a Pro_, https://www.testim.io/blog/supertest-how-to-test-apis-like-a-pro/, accessed: 6 January 2026.
+
+Ulili, S. (2025) _Using Express-Validator for Data Validation in Node.js_, https://betterstack.com/community/guides/scaling-nodejs/express-validator-nodejs/, accessed: 5 January 2025.
