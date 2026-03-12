@@ -8,25 +8,24 @@ FROM node:lts-alpine3.22 AS builder
 
 WORKDIR /app
 
-COPY package*.json .
+ENV NODE_ENV=${BUILD_TYPE}
 
-RUN npm ci --omit-dev
+COPY package*.json ./
+
+RUN npm ci
 
 # Stage 2: Runtime
-FROM node:lts-alpine3.22 AS production
+FROM node:lts-alpine3.22 AS runtime
 
 WORKDIR /app
 
-COPY --from=builder /app/node_modules ./node_modules
-
-COPY . .
-
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
-USER appuser
 
-ENV HOST=0.0.0.0
-ENV PORT=5000
-ENV MONGODB_URI=mongodb://mongo:27017/medimate
+COPY --from=builder --chown=appuser:appgroup /app/node_modules ./node_modules
+
+COPY --chown=appuser:appgroup . .
+
+USER appuser
 
 EXPOSE 5000
 
