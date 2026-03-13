@@ -1,5 +1,6 @@
 services:
   backend-app:
+    image: N-Fahey/medimate-deployed-backend:test_0.1.0
     build:
       context: ./backend
       args:
@@ -12,8 +13,8 @@ services:
       JWT_SECRET: ${JWT_SECRET}
     depends_on:
       - mongo
-    restart: unless-stopped
   frontend-app:
+    image: N-Fahey/medimate-deployed-frontend:test_0.1.0
     build:
       context: ./frontend
       dockerfile: Dockerfile.dev
@@ -24,11 +25,9 @@ services:
       - "80:5173"
     depends_on:
       - backend-app
-    restart: unless-stopped
   mongo:
     image: mongo
     volumes:
-      - mongo-data:/data/db
-    restart: unless-stopped
+      - mongo-data-test:/data/db
 volumes:
-  mongo-data:
+  mongo-data-test:
