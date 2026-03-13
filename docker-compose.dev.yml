@@ -16,6 +16,7 @@ services:
   frontend-app:
     build:
       context: ./frontend
+      dockerfile: Dockerfile.dev
       args:
         BUILD_TYPE: development
         API_URL: http://localhost:5000

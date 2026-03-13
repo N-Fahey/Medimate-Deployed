@@ -1,0 +1,34 @@
+services:
+  backend-app:
+    build:
+      context: ./backend
+      args:
+        BUILD_TYPE: production
+    ports:
+      - "5000:5000"
+    environment:
+      PORT: 5000
+      MONGODB_URI: mongodb://mongo:27017/medimate
+      JWT_SECRET: ${JWT_SECRET}
+    depends_on:
+      - mongo
+    restart: unless-stopped
+  frontend-app:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.build
+      args:
+        BUILD_TYPE: production
+        API_URL: http://localhost:5000
+    ports:
+      - "80:5173"
+    depends_on:
+      - backend-app
+    restart: unless-stopped
+  mongo:
+    image: mongo
+    volumes:
+      - mongo-data:/data/db
+    restart: unless-stopped
+volumes:
+  mongo-data:
