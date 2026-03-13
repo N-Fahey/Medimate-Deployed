@@ -22,8 +22,7 @@ jobs:
 
       - uses: actions/setup-node@v4.0.3
         with:
-          node-version: ${{matrix.node-version}}
-          cache: npm
+          node-version: 24
 
       - name: Install backend dependencies
         run: npm ci
