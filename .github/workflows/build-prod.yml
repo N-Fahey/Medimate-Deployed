@@ -1,0 +1,40 @@
+name: Build & Publish Prod Container
+
+on:
+  workflow_dispatch:
+
+env:
+    REGISTRY: ghcr.io
+    IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    permissions:
+      packages: write
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Login to GHCR registry
+        uses: docker/login-action@v4
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Docker metadata action
+        uses: docker/metadata-action@v6.0.0
+        id: meta
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+
+      - name: Build and push prod image
+        uses: docker/bake-action@v7
+        with:
+            source: ./docker-compose.prod.yml
+            push: true
+            set: |
+                *.tags=${{ steps.meta.outputs.tags }}
