@@ -11,6 +11,8 @@ jobs:
   build-and-push:
     runs-on: ubuntu-latest
 
+    env:
+        JWT_KEY: ${{ secrets.JWT_KEY }}
     permissions:
       packages: write
       contents: read
