@@ -24,14 +24,6 @@ jobs:
         with:
           node-version: 24
 
-      - name: Install backend dependencies
-        run: npm ci
-        working-directory: ./backend
-
-      - name: Install frontend dependencies
-        run: npm ci
-        working-directory: ./frontend
-
       - name: Login to GHCR registry
         uses: docker/login-action@v4
         with:
