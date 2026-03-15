@@ -1,4 +1,4 @@
-name: Build & Publish Prod Container
+name: Build & Publish Containers
 
 on:
   workflow_dispatch:
@@ -8,9 +8,18 @@ env:
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  build-and-push-prod:
+  build-and-publish:
     runs-on: ubuntu-latest
-    environment: Build Environment
+    strategy:
+      matrix:
+        include:
+          - environment: Production
+            compose-file: docker-compose.prod.yml
+          - environment: Development
+            compose-file: docker-compose.dev.yml
+          - environment: Testing
+            compose-file: docker-compose.test.yml
+    environment: ${{ matrix.environment }}
     env:
       JWT_SECRET: ${{ secrets.JWT_KEY }}
       FRONTEND_PORT: ${{ vars.FRONTEND_PORT }}
@@ -41,12 +50,12 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
-      - name: Build and push prod image
+      - name: Build and push ${{ matrix.environment }} image
         uses: docker/bake-action@v7
         with:
           source: .
           push: true
           files: |
-            ./docker-compose.prod.yml
+            ./${{ matrix.compose-file }}
           set: |
             *.tags=${{ steps.meta.outputs.tags }}
