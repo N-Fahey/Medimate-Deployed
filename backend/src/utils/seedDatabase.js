@@ -194,7 +194,17 @@ const seedDatabase = async () => {
   console.log('Database seeded successfully!');
 };
 
+const seedDatabaseProd = async () => {
+  if (await User.countDocuments() === 0) {
+    console.log('No users found. Creating staff user...')
+    await seedUserTypes();
+    await seedStaffUser();
+    console.log('Staff user created successfully!')
+  }
+};
+
 module.exports = {
   seedDatabase,
+  seedDatabaseProd,
   seedUserTypes,
 };

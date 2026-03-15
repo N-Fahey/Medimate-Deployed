@@ -7,6 +7,7 @@
  */
 
 const jwt = require('jsonwebtoken');
+const { getJwtSecret } = require('../utils/secretManager');
 
 module.exports = (request, response, next) => {
   // Extract Authorization header
@@ -27,7 +28,7 @@ module.exports = (request, response, next) => {
 
   // Verify token and attach user data to request
   try {
-    request.user = jwt.verify(token, process.env.JWT_SECRET);
+    request.user = jwt.verify(token, getJwtSecret());
     return next();
   } catch {
     return response.status(401).json({

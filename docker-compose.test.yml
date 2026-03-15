@@ -6,11 +6,12 @@ services:
       args:
         BUILD_TYPE: testing
     ports:
-      - "5000:5000"
+      - "${BACKEND_PORT}:${BACKEND_PORT}"
     environment:
-      PORT: 5000
-      MONGODB_URI: mongodb://mongo:27017/medimate
-      JWT_SECRET: ${JWT_SECRET}
+      PORT: ${BACKEND_PORT}
+      MONGODB_URI: ${MONGODB_URI}
+    secrets:
+      - jwt_secret
     depends_on:
       - mongo
   frontend-app:
@@ -20,9 +21,9 @@ services:
       dockerfile: Dockerfile.dev
       args:
         BUILD_TYPE: testing
-        API_URL: http://localhost:5000
+        API_URL: ${API_URL}
     ports:
-      - "80:5173"
+      - "${FRONTEND_PORT}:5173"
     depends_on:
       - backend-app
   mongo:
@@ -31,3 +32,7 @@ services:
       - mongo-data-test:/data/db
 volumes:
   mongo-data-test:
+
+secrets:
+  jwt_secret:
+    file: ./.secrets/jwt_secret.txt

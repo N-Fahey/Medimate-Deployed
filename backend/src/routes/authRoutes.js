@@ -34,6 +34,7 @@ const createError = require('../utils/httpError');
 const validateFields = require('../middlewares/validateFields');
 const profileController = require('../controllers/profileController');
 const PatientProfile = require('../models/PatientProfile');
+const { getJwtSecret } = require('../utils/secretManager');
 
 const router = express.Router();
 
@@ -106,7 +107,7 @@ router.post(
 
     const token = jwt.sign(
       { userId: user._id, email: user.email, userType: user.userType.typeName },
-      process.env.JWT_SECRET,
+      getJwtSecret(),
       {
         expiresIn: '8h',
       }
