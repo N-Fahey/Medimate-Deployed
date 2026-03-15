@@ -8,11 +8,15 @@ env:
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  build-and-push:
+  build-and-push-prod:
     runs-on: ubuntu-latest
-
+    environment: Build Environment
     env:
       JWT_SECRET: ${{ secrets.JWT_KEY }}
+      FRONTEND_PORT: ${{ vars.FRONTEND_PORT }}
+      BACKEND_PORT: ${{ vars.BACKEND_PORT }}
+      MONGODB_URI: ${{ vars.MONGODB_URI }}
+      API_URL: ${{ vars.API_URL }}
     permissions:
       packages: write
       contents: read
