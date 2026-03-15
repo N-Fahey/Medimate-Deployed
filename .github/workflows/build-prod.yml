@@ -15,10 +15,13 @@ jobs:
         include:
           - environment: Production
             compose-file: docker-compose.prod.yml
+            tag: prod
           - environment: Development
             compose-file: docker-compose.dev.yml
+            tag: dev
           - environment: Testing
             compose-file: docker-compose.test.yml
+            tag: test
     environment: ${{ matrix.environment }}
     env:
       JWT_SECRET: ${{ secrets.JWT_KEY }}
@@ -48,14 +51,7 @@ jobs:
         uses: docker/metadata-action@v6.0.0
         id: meta
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          tags: |
-            type=ref,event=branch
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=raw,value=${{ matrix.environment }}-latest
-            type=sha,prefix=${{ matrix.environment }}-
-            type=raw,value=${{ matrix.environment }}-${{ github.run_number }}
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest-{{ matrix.tag }}
 
       - name: Build and push ${{ matrix.environment }} image
         uses: docker/bake-action@v7
@@ -66,4 +62,3 @@ jobs:
             ./${{ matrix.compose-file }}
           set: |
             *.tags=${{ steps.meta.outputs.tags }}
-            *.labels=${{ steps.meta.outputs.labels }}
